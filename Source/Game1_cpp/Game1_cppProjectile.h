@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Game1_cppProjectile.generated.h"
 
+class UParticleSystem;
+
 UCLASS(config=Game)
 class AGame1_cppProjectile : public AActor
 {
@@ -30,5 +32,8 @@ public:
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystem *ExplosionRffect;
 };
 

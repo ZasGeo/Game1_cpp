@@ -4,6 +4,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "Kismet/GameplayStatics.h"
+
 AGame1_cppProjectile::AGame1_cppProjectile() 
 {
 	// Use a sphere as a simple collision representation
@@ -40,4 +42,6 @@ void AGame1_cppProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 		Destroy();
 	}
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionRffect, GetActorLocation());
 }
