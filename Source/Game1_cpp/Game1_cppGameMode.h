@@ -11,8 +11,20 @@ class AGame1_cppGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category ="Gamplay")
+	TSubclassOf<AActor> SpectatingClass;
+
 public:
 	AGame1_cppGameMode();
+
+
+
+	void CompleteMission(APawn* InstigatorPawn);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Gameplay")
+	void OnMissionComplete(APawn *InstigatorPawn);
 };
 
 
