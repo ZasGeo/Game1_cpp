@@ -21,10 +21,10 @@ public:
 
 
 
-	void CompleteMission(APawn* InstigatorPawn);
+	void CompleteMission(APawn* InstigatorPawn, bool MissionSuccess);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Gameplay")
-	void OnMissionComplete(APawn *InstigatorPawn);
+	void OnMissionComplete(APawn *InstigatorPawn, bool MissionSuccess);
 };
 
 

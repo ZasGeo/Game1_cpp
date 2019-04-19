@@ -141,5 +141,10 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+protected:
+
+	UPROPERTY(VisibleAnywhere, Category = "Sensing")
+	class UPawnNoiseEmitterComponent *NoiseEmmiter;
+
 };
 

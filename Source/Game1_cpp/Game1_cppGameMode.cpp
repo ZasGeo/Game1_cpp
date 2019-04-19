@@ -18,7 +18,7 @@ AGame1_cppGameMode::AGame1_cppGameMode()
 	HUDClass = AGame1_cppHUD::StaticClass();
 }
 
-void AGame1_cppGameMode::CompleteMission(APawn* InstigatorPawn)
+void AGame1_cppGameMode::CompleteMission(APawn* InstigatorPawn, bool MissionSuccess)
 {
 	if (InstigatorPawn)
 	{
@@ -44,7 +44,7 @@ void AGame1_cppGameMode::CompleteMission(APawn* InstigatorPawn)
 
 	}
 
-	OnMissionComplete(InstigatorPawn);
+	OnMissionComplete(InstigatorPawn, MissionSuccess);
 
 	
 

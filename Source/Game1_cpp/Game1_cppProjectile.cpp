@@ -40,8 +40,10 @@ void AGame1_cppProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		Destroy();
+		
 	}
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionRffect, GetActorLocation());
+	MakeNoise(1.0f, Instigator);
+	Destroy();
 }

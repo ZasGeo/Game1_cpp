@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "Components/PawnNoiseEmitterComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -82,6 +83,8 @@ AGame1_cppCharacter::AGame1_cppCharacter()
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
+
+	NoiseEmmiter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmmiter"));
 }
 
 void AGame1_cppCharacter::BeginPlay()
@@ -161,7 +164,7 @@ void AGame1_cppCharacter::OnFire()
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
 				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
+				ActorSpawnParams.Instigator = this;
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AGame1_cppProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 			}

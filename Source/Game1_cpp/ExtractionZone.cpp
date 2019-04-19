@@ -52,7 +52,7 @@ void AExtractionZone::CompOverlap(UPrimitiveComponent* OverlappedComp, AActor* O
 		AGame1_cppGameMode *Gamemode = Cast<AGame1_cppGameMode>( GetWorld()->GetAuthGameMode());
 		if (Gamemode)
 		{
-			Gamemode->CompleteMission(Char);
+			Gamemode->CompleteMission(Char, true);
 		}
 	}
 	else
