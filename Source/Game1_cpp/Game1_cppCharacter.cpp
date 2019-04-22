@@ -12,6 +12,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "Components/PawnNoiseEmitterComponent.h"
+#include "UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -108,6 +109,20 @@ void AGame1_cppCharacter::BeginPlay()
 	}
 }
 
+void AGame1_cppCharacter::Tick(float DelatTime)
+{
+	Super::Tick(DelatTime);
+
+	if (!IsLocallyControlled())
+	{
+		FRotator NewRot = FirstPersonCameraComponent->RelativeRotation;
+		NewRot.Pitch = RemoteViewPitch* 360.0f/255.0f;
+
+		FirstPersonCameraComponent->SetRelativeRotation(NewRot);
+	}
+	
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -143,34 +158,9 @@ void AGame1_cppCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 
 void AGame1_cppCharacter::OnFire()
 {
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
-	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AGame1_cppProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-				ActorSpawnParams.Instigator = this;
-				// spawn the projectile at the muzzle
-				World->SpawnActor<AGame1_cppProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
-		}
-	}
-
+	ServerFire();
+	
 	// try and play the sound if specified
 	if (FireSound != NULL)
 	{
@@ -300,4 +290,42 @@ bool AGame1_cppCharacter::EnableTouchscreenMovement(class UInputComponent* Playe
 	}
 	
 	return false;
+}
+
+void AGame1_cppCharacter::ServerFire_Implementation()
+{
+	// try and fire a projectile
+	if (ProjectileClass != NULL)
+	{
+		UWorld* const World = GetWorld();
+		if (World != NULL)
+		{
+			
+			const FRotator SpawnRotation = GetControlRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			ActorSpawnParams.Instigator = this;
+			// spawn the projectile at the muzzle
+			World->SpawnActor<AGame1_cppProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+		
+		}
+	}
+}
+
+bool AGame1_cppCharacter::ServerFire_Validate()
+{
+	return true;
+}
+
+void AGame1_cppCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGame1_cppCharacter, bISCarryingObjective);
+
+	//DOREPLIFETIME_CONDITION(AGame1_cppCharacter, bISCarryingObjective, COND_OwnerOnly);
 }

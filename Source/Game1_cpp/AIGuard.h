@@ -52,6 +52,9 @@ protected:
 
 	void NextPoint();
 
+	UFUNCTION()
+	void OnRep_GuardState();
+
 	//Change to ai perception
 	UPROPERTY(VisibleAnywhere, Category = "Sensing")
 	class UPawnSensingComponent *PawnSensing;
@@ -62,7 +65,9 @@ protected:
 
 	FTimerHandle Timer_ResetOrientatiom;
 
+	UPROPERTY(ReplicatedUsing=OnRep_GuardState)
 	EAIState GuardState;
+
 
 	TArray<AActor*> TargetPoints;
 
@@ -76,4 +81,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 
+	
 };

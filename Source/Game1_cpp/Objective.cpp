@@ -23,7 +23,7 @@ AObjective::AObjective()
 	SphereComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
-	
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -48,11 +48,16 @@ void AObjective::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	PlayEffect();
 
-	AGame1_cppCharacter *Char = Cast<AGame1_cppCharacter>(OtherActor);
-	if (Char)
+	if (Role == ROLE_Authority)
 	{
-		Char->bISCarryingObjective = true;
-		Destroy();
+		AGame1_cppCharacter *Char = Cast<AGame1_cppCharacter>(OtherActor);
+		if (Char)
+		{
+			Char->bISCarryingObjective = true;
+			Destroy();
+		}
 	}
+
+	
 }
 

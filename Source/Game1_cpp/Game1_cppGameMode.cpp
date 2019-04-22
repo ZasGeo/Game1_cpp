@@ -6,6 +6,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
+#include "FPSGameState.h"
 
 AGame1_cppGameMode::AGame1_cppGameMode()
 	: Super()
@@ -16,38 +17,45 @@ AGame1_cppGameMode::AGame1_cppGameMode()
 
 	// use our custom HUD class
 	HUDClass = AGame1_cppHUD::StaticClass();
+
+	GameStateClass = AFPSGameState::StaticClass();
 }
 
 void AGame1_cppGameMode::CompleteMission(APawn* InstigatorPawn, bool MissionSuccess)
 {
 	if (InstigatorPawn)
 	{
-		InstigatorPawn->DisableInput(nullptr);
+		TArray<AActor*> ReturnedActors;
+		UGameplayStatics::GetAllActorsOfClass(this, SpectatingClass, ReturnedActors);
 
-		APlayerController *PController = Cast<APlayerController>(InstigatorPawn->GetController());
-
-		if (PController)
+		if (ReturnedActors.Num() > 0)
 		{
-			TArray<AActor*> ReturnedActors;
-			UGameplayStatics::GetAllActorsOfClass(this, SpectatingClass, ReturnedActors);
-			
-			if (ReturnedActors.Num() > 0)
+			for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
 			{
-				PController->SetViewTargetWithBlend(ReturnedActors[0], 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+				APlayerController *PC = It->Get();
+				if (PC)
+				{
+					PC->SetViewTargetWithBlend(ReturnedActors[0], 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Cannot change spectating viewtarget"));
-			}
-							
 		}
-
-	}
-
-	OnMissionComplete(InstigatorPawn, MissionSuccess);
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cannot change spectating viewtarget"));
+		}
 
 	
 
+		AFPSGameState *GS = GetGameState<AFPSGameState>();
 
+		if (GS)
+		{
+			GS->MulticastOnMissionComplete(InstigatorPawn, MissionSuccess);
+		}
 
+		OnMissionComplete(InstigatorPawn, MissionSuccess);
+
+	}
+
+	
 }

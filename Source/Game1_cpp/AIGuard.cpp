@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/TargetPoint.h"
 #include "AIController.h"
+#include "UnrealNetwork.h"
 
 // Sets default values
 AAIGuard::AAIGuard() : GuardState { EAIState ::Idle} , CurrentPatrolPoint { 0 }
@@ -28,6 +29,11 @@ void AAIGuard::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalRotation = GetActorRotation();
+
+	FLatentActionInfo huy;
+	
+
+	
 
 	if (bShouldPatrol)
 	{
@@ -115,7 +121,7 @@ void AAIGuard::SetGuardState(EAIState NewState)
 
 	GuardState = NewState;
 
-	OnStateChanged(GuardState);
+	OnRep_GuardState();
 }
 
 void AAIGuard::StartPatrol()
@@ -135,6 +141,11 @@ void AAIGuard::Patrol()
 
 	
 	AAIController * moveController = Cast<AAIController>(GetController());
+
+	if (!moveController)
+	{
+		return;
+	}
 
 	// moves character to location defined by TargetLocation component of moveEvent	
 	switch (moveController->MoveToActor(TargetPoints[CurrentPatrolPoint], 10.0f, true, true, false))
@@ -176,6 +187,11 @@ void AAIGuard::NextPoint()
 	
 }
 
+void AAIGuard::OnRep_GuardState()
+{
+	OnStateChanged(GuardState);
+}
+
 // Called every frame
 void AAIGuard::Tick(float DeltaTime)
 {
@@ -183,5 +199,10 @@ void AAIGuard::Tick(float DeltaTime)
 
 }
 
+void AAIGuard::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AAIGuard, GuardState);
+}
 

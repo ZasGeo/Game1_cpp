@@ -51,6 +51,8 @@ public:
 protected:
 	virtual void BeginPlay();
 
+	virtual void Tick(float DelatTime) override;
+
 public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -80,7 +82,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
-	UPROPERTY(BlueprintReadOnly, Category="Gameplay")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Gameplay")
 	bool bISCarryingObjective;
 
 protected:
@@ -134,6 +136,9 @@ protected:
 	 * @returns true if touch controls were enabled.
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
 
 public:
 	/** Returns Mesh1P subobject **/
